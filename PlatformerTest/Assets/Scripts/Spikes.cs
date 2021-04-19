@@ -9,6 +9,7 @@ public class Spikes : MonoBehaviour
         if (collision.GetComponent<Player>())
         {
             collision.transform.position = RespawnPoints.currentRespawnPoint;
+            collision.GetComponent<Player>().ResetMovement();
         }
     }
 }

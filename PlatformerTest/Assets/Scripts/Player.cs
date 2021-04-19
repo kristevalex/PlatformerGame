@@ -366,4 +366,15 @@ public class Player : MonoBehaviour
             body.position = pos;
         delayedPosition = pos;
     }
+
+    public void ResetMovement()
+    {
+        jumpFrames = 0;
+        wallJumpFrames = 0;
+        dashFrames = 0;
+        isGrounded = false;
+        isWalledL = false;
+        isWalledR = false;
+        framesSinceGround = 0;
+    }
 }
