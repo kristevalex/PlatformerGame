@@ -39,7 +39,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3220038393362381279}
-  - component: {fileID: 3220038393362381272}
   m_Layer: 0
   m_Name: SceneEnters
   m_TagString: Untagged
@@ -64,23 +63,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3220038393362381272
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3220038393362381273}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a75e38878b4f7c49ab8e348c691d795, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enterances:
-  - position: {fileID: 3220038394362878487}
-  - position: {fileID: 3220038393891193942}
-  - position: {fileID: 3220038392670050091}
-  player: {fileID: 0}
 --- !u!1 &3220038393891193943
 GameObject:
   m_ObjectHideFlags: 0

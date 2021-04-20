@@ -99,9 +99,9 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        Timer.Reset();
         body = gameObject.GetComponent<Rigidbody2D>();
         collider = gameObject.GetComponent<BoxCollider2D>();
-        body.fixedAngle = true;
         velocity = new Vector2(0.0f, 0.0f);
         horizontal = 0;
         direction = 1;
@@ -119,39 +119,17 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown("'"))
-            rightPressed = true;
-        if (Input.GetKeyUp("'"))
-            rightPressed = false;
-
-        if (Input.GetKeyDown("l"))
-            leftPressed = true;
-        if (Input.GetKeyUp("l"))
-            leftPressed = false;
-
-        if (Input.GetKeyDown("p"))
-            upPressed = true;
-        if (Input.GetKeyUp("p"))
-            upPressed = false;
-
-        if (Input.GetKeyDown(";"))
-            downPressed = true;
-        if (Input.GetKeyUp(";"))
-            downPressed = false;
-
-        if (Input.GetKeyDown("z"))
-            jumpPressed = true;
-        if (Input.GetKeyUp("z"))
-            jumpPressed = false;
-
-        if (Input.GetKeyDown("c"))
-            dashPressed = true;
-        if (Input.GetKeyUp("c"))
-            dashPressed = false;
+        
     }
 
     private void FixedUpdate()
-    { 
+    {
+        if (PauseMenu.gamePaused)
+        {
+            body.velocity = Vector2.zero;
+            return;
+        }
+
         if (isGrounded)
             velocity.y = Mathf.Max(velocity.y, 0.0f);
         else if (Mathf.Abs(velocity.y - body.velocity.y) > eps && jumpFrames > 0)
@@ -163,12 +141,12 @@ public class Player : MonoBehaviour
         isWalledLUpdate();
 
         horizontal = 0;
-        if (Input.GetKey("'"))
+        if (Input.GetKey(KeyCode.RightArrow))
             ++horizontal;
-        if (Input.GetKey("l"))
+        if (Input.GetKey(KeyCode.LeftArrow))
             --horizontal;
         jumpPressed = Input.GetKey("z");
-        downPressed = Input.GetKey(";");
+        downPressed = Input.GetKey(KeyCode.UpArrow);
         dashPressed = Input.GetKey("c");
 
         if (!jumpPressed)
