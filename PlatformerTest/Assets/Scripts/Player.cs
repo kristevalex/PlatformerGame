@@ -5,9 +5,10 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private Vector2 velocity;
-    private Vector2 delayedPosition;
+    private Vector2 backupVelocity;
+    private bool applyBackup;
     private Rigidbody2D body;
-    private BoxCollider2D collider;
+    private BoxCollider2D playerCollider;
     private int horizontal;
     private int direction;
     private int jumpFrames;
@@ -101,7 +102,7 @@ public class Player : MonoBehaviour
     {
         Timer.Reset();
         body = gameObject.GetComponent<Rigidbody2D>();
-        collider = gameObject.GetComponent<BoxCollider2D>();
+        playerCollider = gameObject.GetComponent<BoxCollider2D>();
         velocity = new Vector2(0.0f, 0.0f);
         horizontal = 0;
         direction = 1;
@@ -113,6 +114,7 @@ public class Player : MonoBehaviour
         doubleJumpActive = false;
         dashButtonActive = false;
         dashFromGround = false;
+        applyBackup = false;
         eps = 0.001f * maxSpeed / (accFrames + decFrames);
         Input.ResetInputAxes();
     }
@@ -124,6 +126,23 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (CameraPosition.cameraTransition)
+        {
+            if (!applyBackup)
+            {
+                applyBackup = true;
+                backupVelocity = body.velocity;
+                body.velocity = Vector2.zero;
+            }
+            return;
+        }
+
+        if (applyBackup)
+        {
+            body.velocity = backupVelocity;
+            applyBackup = false;
+        }
+
         if (PauseMenu.gamePaused)
         {
             body.velocity = Vector2.zero;
@@ -295,7 +314,7 @@ public class Player : MonoBehaviour
 
     private void isGroundedUpdate()
     {
-        RaycastHit2D raycastHit = Physics2D.BoxCast(collider.bounds.center, collider.bounds.size, 0.0f, Vector2.down, checkBoxOffset, platformLayer);
+        RaycastHit2D raycastHit = Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0.0f, Vector2.down, checkBoxOffset, platformLayer);
 
         Color rayColor;
         if (raycastHit.collider != null)
@@ -303,14 +322,14 @@ public class Player : MonoBehaviour
         else
             rayColor = Color.red;
 
-        Debug.DrawRay(collider.bounds.center - new Vector3(collider.bounds.extents.x, collider.bounds.extents.y + checkBoxOffset), Vector2.right * collider.bounds.extents.x * 2, rayColor);
+        Debug.DrawRay(playerCollider.bounds.center - new Vector3(playerCollider.bounds.extents.x, playerCollider.bounds.extents.y + checkBoxOffset), Vector2.right * playerCollider.bounds.extents.x * 2, rayColor);
 
         isGrounded = raycastHit.collider != null;
     }
 
     private void isWalledRUpdate()
     {
-        RaycastHit2D raycastHit = Physics2D.BoxCast(collider.bounds.center, collider.bounds.size, 0.0f, Vector2.right, checkBoxOffset, platformLayer);
+        RaycastHit2D raycastHit = Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0.0f, Vector2.right, checkBoxOffset, platformLayer);
 
         Color rayColor;
         if (raycastHit.collider != null)
@@ -318,14 +337,14 @@ public class Player : MonoBehaviour
         else
             rayColor = Color.red;
 
-        Debug.DrawRay(collider.bounds.center + new Vector3(collider.bounds.extents.x + checkBoxOffset, collider.bounds.extents.y), Vector2.down * collider.bounds.extents.y * 2, rayColor);
+        Debug.DrawRay(playerCollider.bounds.center + new Vector3(playerCollider.bounds.extents.x + checkBoxOffset, playerCollider.bounds.extents.y), Vector2.down * playerCollider.bounds.extents.y * 2, rayColor);
 
         isWalledR = raycastHit.collider != null;
     }
 
     private void isWalledLUpdate()
     {
-        RaycastHit2D raycastHit = Physics2D.BoxCast(collider.bounds.center, collider.bounds.size, 0.0f, Vector2.left, checkBoxOffset, platformLayer);
+        RaycastHit2D raycastHit = Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0.0f, Vector2.left, checkBoxOffset, platformLayer);
 
         Color rayColor;
         if (raycastHit.collider != null)
@@ -333,7 +352,7 @@ public class Player : MonoBehaviour
         else
             rayColor = Color.red;
 
-        Debug.DrawRay(collider.bounds.center + new Vector3(-collider.bounds.extents.x - checkBoxOffset, collider.bounds.extents.y), Vector2.down * collider.bounds.extents.y * 2, rayColor);
+        Debug.DrawRay(playerCollider.bounds.center + new Vector3(-playerCollider.bounds.extents.x - checkBoxOffset, playerCollider.bounds.extents.y), Vector2.down * playerCollider.bounds.extents.y * 2, rayColor);
 
         isWalledL = raycastHit.collider != null;
     }
@@ -342,7 +361,6 @@ public class Player : MonoBehaviour
     {
         if (body)
             body.position = pos;
-        delayedPosition = pos;
     }
 
     public void ResetMovement()

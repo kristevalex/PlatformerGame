@@ -16,7 +16,7 @@ public class Timer : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (text)
+        if (text && !CameraPosition.cameraTransition)
         {
             if (!active)
                 return;
