@@ -160,13 +160,13 @@ public class Player : MonoBehaviour
         isWalledLUpdate();
 
         horizontal = 0;
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyBinds.keyBinds["Right"]))
             ++horizontal;
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyBinds.keyBinds["Left"]))
             --horizontal;
-        jumpPressed = Input.GetKey("z");
-        downPressed = Input.GetKey(KeyCode.UpArrow);
-        dashPressed = Input.GetKey("c");
+        jumpPressed = Input.GetKey(KeyBinds.keyBinds["Jump"]);
+        downPressed = Input.GetKey(KeyBinds.keyBinds["Down"]);
+        dashPressed = Input.GetKey(KeyBinds.keyBinds["Dash"]);
 
         if (!jumpPressed)
             jumpInputUsed = false;

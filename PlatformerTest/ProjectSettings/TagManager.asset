@@ -5,6 +5,13 @@ TagManager:
   serializedVersion: 2
   tags:
   - TimerStop
+  - Right
+  - Left
+  - Up
+  - Down
+  - Jump
+  - Dash
+  - Timelapse
   layers:
   - Default
   - TransparentFX
