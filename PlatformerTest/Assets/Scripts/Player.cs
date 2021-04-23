@@ -100,6 +100,7 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        Storage.LoadKeyBinds();
         Timer.Reset();
         body = gameObject.GetComponent<Rigidbody2D>();
         playerCollider = gameObject.GetComponent<BoxCollider2D>();
