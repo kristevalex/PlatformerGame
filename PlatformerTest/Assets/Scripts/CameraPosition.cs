@@ -44,11 +44,11 @@ public class CameraPosition : MonoBehaviour
 
         if (firstCamera)
         {
-            cameraPosition = player.transform.position;
+            cameraPosition = player.transform.position + offset;
             cameraPosition.x = Mathf.Max(Mathf.Min(cameraPosition.x, cornerTVec.x), cornerBVec.x);
             cameraPosition.y = Mathf.Max(Mathf.Min(cameraPosition.y, cornerTVec.y), cornerBVec.y);
             cameraPosition.z = z;
-            mainCamera.position = cameraPosition + offset;
+            mainCamera.position = cameraPosition;
 
             firstCamera = false;
         }
@@ -57,12 +57,10 @@ public class CameraPosition : MonoBehaviour
             cameraTransition = true;
             transitionStart = Time.time;
 
-            targetPosition = player.transform.position;
+            targetPosition = player.transform.position + offset;
             targetPosition.x = Mathf.Max(Mathf.Min(targetPosition.x, cornerTVec.x), cornerBVec.x);
             targetPosition.y = Mathf.Max(Mathf.Min(targetPosition.y, cornerTVec.y), cornerBVec.y);
             targetPosition.z = z;
-
-            targetPosition += offset;
         }
 
         counter = counterGeneral;
@@ -90,12 +88,12 @@ public class CameraPosition : MonoBehaviour
             return;
         }
 
-        cameraPosition = player.transform.position;
+        cameraPosition = player.transform.position + offset;
         cameraPosition.x = Mathf.Max(Mathf.Min(cameraPosition.x, cornerTVec.x), cornerBVec.x);
         cameraPosition.y = Mathf.Max(Mathf.Min(cameraPosition.y, cornerTVec.y), cornerBVec.y);
         cameraPosition.z = z;
         
-        mainCamera.position = cameraPosition + offset;
+        mainCamera.position = cameraPosition;
         oldPosition = mainCamera.position;
 
         counterGeneral++;

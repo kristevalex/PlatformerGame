@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     private bool dashButtonActive;
     private bool dashFromGround;
     private float checkBoxOffset = 0.05f;
+    private bool unlimitedJump;
 
     private static bool downPressed;
     private static bool upPressed;
@@ -93,6 +94,16 @@ public class Player : MonoBehaviour
     private bool midJumpDash;
     [SerializeField]
     private bool groundDashJump;
+    [SerializeField]
+    private float orbDashSpeedCoefficientX;
+    [SerializeField]
+    private float orbDashSpeedCoefficientY;
+    [SerializeField]
+    private float orbDashCurrentSpeedCoefficient;
+    [SerializeField]
+    private int orbDashRefreshTiming;
+    [SerializeField]
+    private float minOrbBounceMagnitude;
 
 
     private float eps;
@@ -116,6 +127,7 @@ public class Player : MonoBehaviour
         dashButtonActive = false;
         dashFromGround = false;
         applyBackup = false;
+        unlimitedJump = false;
         eps = 0.001f * maxSpeed / (accFrames + decFrames);
         Input.ResetInputAxes();
     }
@@ -160,6 +172,9 @@ public class Player : MonoBehaviour
         isWalledRUpdate();
         isWalledLUpdate();
 
+        if (isGrounded)
+            unlimitedJump = false;
+
         horizontal = 0;
         if (Input.GetKey(KeyBinds.keyBinds["Right"]))
             ++horizontal;
@@ -174,24 +189,27 @@ public class Player : MonoBehaviour
        
         if (horizontal != 0 && (dashFrames <= 0 || dashFrames >= maxDashFrames))
             direction = horizontal;
-
+               
         if (horizontal == 0)
         {
-            if (velocity.x < -eps)
+            if (velocity.x > 0)
                 velocity.x = Mathf.Max(velocity.x - maxSpeed / decFrames, 0);
             else
                 velocity.x = Mathf.Min(velocity.x + maxSpeed / accFrames, 0);
         }
         else
         {
+            if (Mathf.Abs(velocity.x) < maxSpeed)
+                unlimitedJump = false;
+
             if (velocity.x * horizontal < 0.0f)
                 velocity.x += maxSpeed * horizontal / decFrames;
-            else
+            else if (Mathf.Abs(velocity.x) < maxSpeed)
                 velocity.x += maxSpeed * horizontal / accFrames;
 
-            if (velocity.x > maxSpeed)
+            if (velocity.x > maxSpeed && !unlimitedJump)
                 velocity.x = maxSpeed;
-            if (velocity.x < -maxSpeed)
+            if (velocity.x < -maxSpeed && !unlimitedJump)
                 velocity.x = -maxSpeed;
         }
 
@@ -211,6 +229,9 @@ public class Player : MonoBehaviour
         if (isGrounded && jumpFrames == maxJumpFrames)
             jumpFrames = 0;
 
+        if (JumpOrb.readyToJump && JumpOrb.instance != null && jumpFrames == maxJumpFrames)
+            jumpFrames = 0;
+
 
         if (jumpPressed && jumpFrames < maxJumpFrames && (dashFrames <= 0 || dashFrames >= maxDashFrames) && (jumpButtonActive || jumpFrames > 0))
         {
@@ -218,6 +239,12 @@ public class Player : MonoBehaviour
             ++jumpFrames;
             jumpButtonActive = false;
             jumpInputUsed = true;
+
+            if (JumpOrb.instance != null && jumpFrames == 1)
+            {
+                JumpOrb.instance.CooldownStart();
+                dashFrames = 0;
+            }
         }
         else if (dashFrames <= 0 || dashFrames >= maxDashFrames)
         {
@@ -282,15 +309,33 @@ public class Player : MonoBehaviour
 
         if (((dashPressed && dashButtonActive) || dashFrames > 0) && dashFrames < maxDashFrames && dashFrames >= 0)
         {
-            velocity.x = maxDashSpeed * direction;
-            velocity.y = 0;
-            ++dashFrames;
+            if (JumpOrb.readyToJump && JumpOrb.instance != null)
+            {
+                velocity.x = orbDashCurrentSpeedCoefficient * maxDashSpeed * direction;
+                Vector3 forceDirection = transform.position - JumpOrb.instance.transform.position;
+                velocity.x += forceDirection.normalized.x * orbDashSpeedCoefficientX * Mathf.Abs(forceDirection.normalized.x);
+                velocity.y += forceDirection.normalized.y * orbDashSpeedCoefficientY;
 
-            dashButtonActive = false;
+                if (velocity.sqrMagnitude < minOrbBounceMagnitude * minOrbBounceMagnitude)
+                    velocity = velocity.normalized * minOrbBounceMagnitude;
+                                
+                unlimitedJump = true;
+                if (maxDashFrames - dashFrames <= orbDashRefreshTiming)
+                    dashFromGround = true;
+                dashFrames = maxDashFrames;
+                JumpOrb.instance.CooldownStart();
+            }
+            else
+            {
+                velocity.x = maxDashSpeed * direction;
+                velocity.y = 0;
+                ++dashFrames;
 
-            if (framesSinceGround <= maxFloatJumpFrames)
-                dashFromGround = true;
+                dashButtonActive = false;
 
+                if (framesSinceGround <= maxFloatJumpFrames)
+                    dashFromGround = true;
+            }
         }
         else
         {
@@ -373,5 +418,7 @@ public class Player : MonoBehaviour
         isWalledL = false;
         isWalledR = false;
         framesSinceGround = 0;
+        body.velocity = Vector2.zero;
+        unlimitedJump = false;
     }
 }
