@@ -189,7 +189,8 @@ public class Player : MonoBehaviour
        
         if (horizontal != 0 && (dashFrames <= 0 || dashFrames >= maxDashFrames))
             direction = horizontal;
-               
+                       
+
         if (horizontal == 0)
         {
             if (velocity.x > 0)
@@ -206,10 +207,13 @@ public class Player : MonoBehaviour
                 velocity.x += maxSpeed * horizontal / decFrames;
             else if (Mathf.Abs(velocity.x) < maxSpeed)
                 velocity.x += maxSpeed * horizontal / accFrames;
+        }
 
-            if (velocity.x > maxSpeed && !unlimitedJump)
+        if (!unlimitedJump)
+        {
+            if (velocity.x > maxSpeed)
                 velocity.x = maxSpeed;
-            if (velocity.x < -maxSpeed && !unlimitedJump)
+            if (velocity.x < -maxSpeed)
                 velocity.x = -maxSpeed;
         }
 
